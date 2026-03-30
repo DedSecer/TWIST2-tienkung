@@ -45,14 +45,27 @@ from .g1.g1_mimic_distill_config import G1MimicStuRLCfg, G1MimicStuRLCfgDAgger
 from .g1.g1_mimic_future import G1MimicFuture
 from .g1.g1_mimic_future_config import G1MimicStuFutureCfg, G1MimicStuFutureCfgDAgger
 
+# Tienkung
+from .tienkung.tienkung_mimic_distill import TienkungMimicDistill
+from .tienkung.tienkung_mimic_distill_config import TienkungMimicPrivCfg, TienkungMimicPrivCfgPPO, TienkungMimicStuCfg, TienkungMimicStuCfgDAgger
+from .tienkung.tienkung_mimic_distill_config import TienkungMimicStuRLCfg, TienkungMimicStuRLCfgDAgger
+from .tienkung.tienkung_mimic_future import TienkungMimicFuture
+from .tienkung.tienkung_mimic_future_config import TienkungMimicStuFutureCfg, TienkungMimicStuFutureCfgDAgger
+
 from legged_gym.gym_utils.task_registry import task_registry
 
 
-# DeepMimic (for teleoperation)
+# DeepMimic G1 (for teleoperation)
 task_registry.register("g1_mimic", G1Mimic, G1MimicCfg(), G1MimicCfgPPO())
 task_registry.register("g1_stu_mimic", G1MimicDistill, G1MimicStuCfg(), G1MimicStuCfgDAgger())
 task_registry.register("g1_priv_mimic", G1MimicDistill, G1MimicPrivCfg(), G1MimicPrivCfgPPO())
 task_registry.register("g1_stu_rl", G1MimicDistill, G1MimicStuRLCfg(), G1MimicStuRLCfgDAgger())
 task_registry.register("g1_stu_future", G1MimicFuture, G1MimicStuFutureCfg(), G1MimicStuFutureCfgDAgger())
+
+# Tienkung
+task_registry.register("tienkung_stu_mimic", TienkungMimicDistill, TienkungMimicStuCfg(), TienkungMimicStuCfgDAgger())
+task_registry.register("tienkung_priv_mimic", TienkungMimicDistill, TienkungMimicPrivCfg(), TienkungMimicPrivCfgPPO())
+task_registry.register("tienkung_stu_rl", TienkungMimicDistill, TienkungMimicStuRLCfg(), TienkungMimicStuRLCfgDAgger())
+task_registry.register("tienkung_stu_future", TienkungMimicFuture, TienkungMimicStuFutureCfg(), TienkungMimicStuFutureCfgDAgger())
 
 
