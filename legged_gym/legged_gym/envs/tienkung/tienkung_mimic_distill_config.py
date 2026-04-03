@@ -46,7 +46,7 @@ class TienkungMimicPrivCfg(HumanoidMimicCfg):
         
         enable_early_termination = True
         pose_termination = True
-        pose_termination_dist = 0.7
+        pose_termination_dist = 1.4
         rand_reset = True
         
         track_root = False
