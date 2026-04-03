@@ -60,12 +60,27 @@ DEFAULT_MIMIC_OBS_TODDY = np.concatenate([
                     ])
                 ])
 
+DEFAULT_MIMIC_OBS_TIENKUNG = np.concatenate([
+                    np.array([0, 0]),  # xy velocity
+                    np.array([0.95]),  # z position
+                    np.array([0, 0]),  # roll/pitch
+                    np.array([0]),     # yaw angular velocity
+                    # 20 dof: left leg (6), right leg (6), left arm (4), right arm (4)
+                    np.array([
+                        0.0, -0.2, 0.0, 0.4, -0.2, 0.0,
+                        0.0, -0.2, 0.0, 0.4, -0.2, 0.0,
+                        0.0, 0.4, 0.0, -0.8,
+                        0.0, -0.4, 0.0, -0.8,
+                    ])
+                ])
+
 DEFAULT_MIMIC_OBS = {
     "unitree_g1": DEFAULT_MIMIC_OBS_G1,
     "unitree_g1_mixed_mode": DEFAULT_MIMIC_OBS_G1_MIXED_MODE,
     "unitree_g1_with_hands": DEFAULT_MIMIC_OBS_G1,
     "booster_t1": DEFAULT_MIMIC_OBS_T1,
     "stanford_toddy": DEFAULT_MIMIC_OBS_TODDY,
+    "tienkung": DEFAULT_MIMIC_OBS_TIENKUNG,
 }
 
 
