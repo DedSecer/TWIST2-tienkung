@@ -30,5 +30,6 @@
 
 from .on_policy_runner import OnPolicyRunner
 from .on_policy_runner_mimic import OnPolicyRunnerMimic
+from .on_policy_amp_mimic_runner import OnPolicyAMPMimicRunner
 from .dagger_runner import DAggerRunner
 from .on_policy_dagger_runner import OnPolicyDaggerRunner

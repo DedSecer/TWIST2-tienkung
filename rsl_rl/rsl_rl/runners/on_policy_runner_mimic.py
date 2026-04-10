@@ -41,7 +41,7 @@ import wandb
 import datetime
 
 import numpy as np
-from rsl_rl.algorithms import PPO
+from rsl_rl.algorithms import PPO, AMPPPO
 from rsl_rl.modules import *
 from rsl_rl.storage.replay_buffer import ReplayBuffer
 from rsl_rl.env import VecEnv
