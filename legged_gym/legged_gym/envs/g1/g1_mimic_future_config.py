@@ -72,7 +72,7 @@ class G1MimicStuFutureCfg(G1MimicPrivCfg):
             only_apply_resistance_when_walking = True # Apply resistance forces against movement
     
     class motion(G1MimicPrivCfg.motion):
-        motion_file = f"{LEGGED_GYM_ROOT_DIR}/motion_data_configs/twist2_dataset.yaml"
+        motion_file = f"{LEGGED_GYM_ROOT_DIR}/motion_data_configs/unitree_g1_retarget.yaml"
         
         # Ensure motion curriculum is enabled for difficulty adaptation
         motion_curriculum = True
@@ -82,7 +82,7 @@ class G1MimicStuFutureCfg(G1MimicPrivCfg):
         # use_adaptive_pose_termination = Truee
         
         # Motion Domain Randomization - Enable for robustness
-        motion_dr_enabled = False
+        motion_dr_enabled = True
         root_position_noise = [0.01, 0.05]  # ±1-5cm noise range for root position
         root_orientation_noise = [0.1, 0.2]  # ±5.7-11.4° noise range for root orientation (in rad)
         root_velocity_noise = [0.05, 0.1]   # ±0.05-0.1 noise range for root velocity

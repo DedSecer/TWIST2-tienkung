@@ -335,7 +335,14 @@ class G1MimicPrivCfg(HumanoidMimicCfg):
         motion_decompose = False
 
         motion_file = f"{LEGGED_GYM_ROOT_DIR}/motion_data_configs/g1_omomo+mocap_static+amass_walk.yaml"
-        
+
+
+class G1MimicPrivAmpCfg(G1MimicPrivCfg):
+    class env(G1MimicPrivCfg.env):
+        enable_amp = True
+
+    class motion(G1MimicPrivCfg.motion):
+        motion_file = f"{LEGGED_GYM_ROOT_DIR}/motion_data_configs/unitree_g1_retarget_fft.yaml"
 
 
 class G1MimicStuCfg(G1MimicPrivCfg):
@@ -399,6 +406,24 @@ class G1MimicPrivCfgPPO(HumanoidMimicCfgPPO):
         motion_latent_dim = 128
         
         
+class G1MimicPrivAmpCfgPPO(G1MimicPrivCfgPPO):
+    class runner(G1MimicPrivCfgPPO.runner):
+        algorithm_class_name = 'AMPPPO'
+        runner_class_name = 'OnPolicyAMPMimicRunner'
+        experiment_name = 'g1_priv_mimic_amp'
+
+    class algorithm(G1MimicPrivCfgPPO.algorithm):
+        amp_reward_scale = 0.1
+        amp_reward_clip_min = -2.0
+        amp_reward_clip_max = 2.0
+        amp_obs_dim = 130
+        amp_disc_hidden_dims = [512, 256]
+        amp_disc_learning_rate = 1e-4
+        amp_disc_loss_coef = 1.0
+        amp_disc_grad_penalty = 5.0
+        amp_disc_batch_size = 8192
+
+
 class G1MimicStuCfgDAgger(G1MimicPrivCfgPPO):
     seed = 1
     

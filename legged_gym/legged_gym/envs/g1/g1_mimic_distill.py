@@ -288,6 +288,10 @@ class G1MimicDistill(HumanoidMimic):
                     # Add new observation at the end
                     self.obs_history_buf[continue_indices, -1] = obs_buf[continue_indices]
 
+        if getattr(self.cfg.env, "enable_amp", False):
+            self.extras["amp_obs"] = self._get_amp_obs().detach()
+            self.extras["amp_demo_obs"] = self._get_amp_demo_obs().detach()
+
 
 ############################################################################################################
 ##################################### Extra Reward Functions################################################

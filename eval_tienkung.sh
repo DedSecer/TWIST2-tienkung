@@ -1,5 +1,10 @@
 #!/bin/bash
 # Usage: bash eval_tienkung.sh <experiment_id> <device>
+
+# Activate twist2 conda environment
+source /home/vega/anaconda3/etc/profile.d/conda.sh
+conda activate twist2
+export LD_LIBRARY_PATH=/home/vega/anaconda3/envs/twist2/lib:${LD_LIBRARY_PATH}
 # Example: bash eval_tienkung.sh 0330_tienkung_twist2 cuda:0
 
 # You can specify a specific motion file here to evaluate on

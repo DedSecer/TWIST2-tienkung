@@ -1,5 +1,11 @@
+#!/bin/bash
 
 # bash eval.sh 1002_twist2 cuda:1
+
+# Activate twist2 conda environment
+source /home/vega/anaconda3/etc/profile.d/conda.sh
+conda activate twist2
+export LD_LIBRARY_PATH=/home/vega/anaconda3/envs/twist2/lib:${LD_LIBRARY_PATH}
 
 
 

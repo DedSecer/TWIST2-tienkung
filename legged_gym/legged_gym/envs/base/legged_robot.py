@@ -37,7 +37,7 @@ import os
 from isaacgym.torch_utils import *
 from isaacgym import gymtorch, gymapi, gymutil
 
-import torch, torchvision
+import torch
 from torch import Tensor
 from typing import Tuple, Dict
 
