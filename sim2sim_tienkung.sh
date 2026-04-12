@@ -9,7 +9,7 @@
 SCRIPT_DIR=$(dirname $(realpath $0))
 
 # Default: use provided argument or a placeholder
-ckpt_path=${1:-${SCRIPT_DIR}/assets/ckpts/twist2_0403_2_tienkung_30k.onnx}
+ckpt_path=${1:-${SCRIPT_DIR}/assets/ckpts/twist2_0406_pdgain_tienkung_30k.onnx}
 
 cd deploy_real
 
