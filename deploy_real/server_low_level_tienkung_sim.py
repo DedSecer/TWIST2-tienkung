@@ -108,42 +108,43 @@ class TienkungSimController:
         #            hip_roll_r, hip_pitch_r, hip_yaw_r, knee_pitch_r, ankle_pitch_r, ankle_roll_r,
         #            shoulder_pitch_l, shoulder_roll_l, shoulder_yaw_l, elbow_pitch_l,
         #            shoulder_pitch_r, shoulder_roll_r, shoulder_yaw_r, elbow_pitch_r
+        # Default DOF positions — from official TienKung-Lab reference config
         self.default_dof_pos = np.array([
-                0.0, -0.2, 0.0, 0.4, -0.2, 0.0,   # left leg (6)
-                0.0, -0.2, 0.0, 0.4, -0.2, 0.0,   # right leg (6)
-                0.0, 0.4, 0.0, -0.8,               # left arm (4)
-                0.0, -0.4, 0.0, -0.8,              # right arm (4)
+                0.0, -0.5, 0.0, 1.0, -0.5, 0.0,   # left leg:  hip_roll, hip_pitch, hip_yaw, knee, ankle_pitch, ankle_roll
+                0.0, -0.5, 0.0, 1.0, -0.5, 0.0,   # right leg
+                0.0,  0.1, 0.0, -0.3,              # left arm:  shoulder_pitch, shoulder_roll, shoulder_yaw, elbow
+                0.0, -0.1, 0.0, -0.3,              # right arm
             ])
 
         self.mujoco_default_dof_pos = np.concatenate([
-            np.array([0, 0, 0.95]),     # root position (x, y, z)
+            np.array([0, 0, 1.0]),      # root position (x, y, z) — from MJCF Base_link pos
             np.array([1, 0, 0, 0]),     # root quaternion (w, x, y, z)
-            np.array([0.0, -0.2, 0.0, 0.4, -0.2, 0.0,   # left leg (6)
-                      0.0, -0.2, 0.0, 0.4, -0.2, 0.0,   # right leg (6)
-                      0.0, 0.4, 0.0, -0.8,               # left arm (4)
-                      0.0, -0.4, 0.0, -0.8,              # right arm (4)
+            np.array([0.0, -0.5, 0.0, 1.0, -0.5, 0.0,   # left leg
+                      0.0, -0.5, 0.0, 1.0, -0.5, 0.0,   # right leg
+                      0.0,  0.1, 0.0, -0.3,              # left arm
+                      0.0, -0.1, 0.0, -0.3,              # right arm
                 ])
         ])
 
-        # PD gains from training config (tienkung_mimic_distill_config.py)
+        # PD gains — from official TienKung-Lab reference config (same source as MJCF kp/damping)
         self.stiffness = np.array([
-                100, 100, 100, 150, 40, 40,  # left leg: hip_roll, hip_pitch, hip_yaw, knee, ankle_pitch, ankle_roll
-                100, 100, 100, 150, 40, 40,  # right leg
-                40, 40, 40, 40,              # left arm: shoulder_pitch, shoulder_roll, shoulder_yaw, elbow
-                40, 40, 40, 40,              # right arm
+                700, 700, 500, 700, 30,   16.8,   # left leg:  hip_roll, hip_pitch, hip_yaw, knee, ankle_pitch, ankle_roll
+                700, 700, 500, 700, 30,   16.8,   # right leg
+                60,  20,  10,  10,                # left arm:  shoulder_pitch, shoulder_roll, shoulder_yaw, elbow
+                60,  20,  10,  10,                # right arm
             ])
         self.damping = np.array([
-                2, 2, 2, 4, 2, 2,   # left leg
-                2, 2, 2, 4, 2, 2,   # right leg
-                5, 5, 5, 5,         # left arm
-                5, 5, 5, 5,         # right arm
+                10,  10,  5,   10,  2.5, 1.4,    # left leg
+                10,  10,  5,   10,  2.5, 1.4,    # right leg
+                3,   1.5, 1,   1,                 # left arm
+                3,   1.5, 1,   1,                 # right arm
             ])
 
         self.torque_limits = np.array([
-                100, 100, 100, 150, 40, 40,  # left leg
-                100, 100, 100, 150, 40, 40,  # right leg
-                40, 40, 40, 40,              # left arm
-                40, 40, 40, 40,              # right arm
+                180, 300, 180, 300, 60,  30,      # left leg  — from effort_limit_sim in TienKung-Lab cfg
+                180, 300, 180, 300, 60,  30,      # right leg
+                52.5, 52.5, 52.5, 52.5,           # left arm
+                52.5, 52.5, 52.5, 52.5,           # right arm
             ])
 
         self.action_scale = np.array([
