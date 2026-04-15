@@ -67,7 +67,7 @@ class TienkungMimicPrivCfg(HumanoidMimicCfg):
         horizontal_scale = 0.1
     
     class init_state(HumanoidMimicCfg.init_state):
-        pos = [0, 0, 1.0]  # Tienkung standing height (from MJCF: Base_link pos="0 0 1.0")
+        pos = [0, 0, 1.0]  # Tienkung standing height (from MJCF: pelvis pos="0 0 1.0")
         default_joint_angles = {
             # Left Leg
             'hip_roll_l_joint':   0.0,

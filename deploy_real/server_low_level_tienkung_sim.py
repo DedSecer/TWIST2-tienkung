@@ -117,7 +117,7 @@ class TienkungSimController:
             ])
 
         self.mujoco_default_dof_pos = np.concatenate([
-            np.array([0, 0, 1.0]),      # root position (x, y, z) — from MJCF Base_link pos
+            np.array([0, 0, 1.0]),      # root position (x, y, z) — from MJCF pelvis pos
             np.array([1, 0, 0, 0]),     # root quaternion (w, x, y, z)
             np.array([0.0, -0.5, 0.0, 1.0, -0.5, 0.0,   # left leg
                       0.0, -0.5, 0.0, 1.0, -0.5, 0.0,   # right leg
@@ -345,8 +345,8 @@ class TienkungSimController:
                     scaled_actions = raw_action * self.action_scale
                     pd_target = scaled_actions + self.default_dof_pos
 
-                    # Update camera to follow pelvis (Base_link in Tienkung)
-                    pelvis_pos = self.data.xpos[self.model.body("Base_link").id]
+                    # Update camera to follow pelvis
+                    pelvis_pos = self.data.xpos[self.model.body("pelvis").id]
                     self.viewer.cam.lookat = pelvis_pos
                     self.viewer.sync()
                     

@@ -307,7 +307,7 @@ if __name__ == "__main__":
         robot_base = "pelvis"
     elif args.robot == "tienkung":
         xml_file = f"{HERE}/../assets/tienkung/mjcf/tienkung.xml"
-        robot_base = "Base_link"
+        robot_base = "pelvis"
     else:
         raise ValueError(f"robot type {args.robot} not supported")
     

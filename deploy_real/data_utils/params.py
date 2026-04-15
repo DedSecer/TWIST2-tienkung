@@ -62,7 +62,7 @@ DEFAULT_MIMIC_OBS_TODDY = np.concatenate([
 
 DEFAULT_MIMIC_OBS_TIENKUNG = np.concatenate([
                     np.array([0, 0]),  # xy velocity
-                    np.array([1.0]),   # z position — from MJCF Base_link pos="0 0 1.0"
+                    np.array([1.0]),   # z position — from MJCF pelvis pos="0 0 1.0"
                     np.array([0, 0]),  # roll/pitch
                     np.array([0]),     # yaw angular velocity
                     # 20 dof: left leg (6), right leg (6), left arm (4), right arm (4)
