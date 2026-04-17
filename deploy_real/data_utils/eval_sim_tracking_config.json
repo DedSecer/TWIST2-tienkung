@@ -1,0 +1,24 @@
+{
+  "weights": {
+    "joint": 0.35,
+    "key_body": 0.25,
+    "root_pos": 0.15,
+    "root_rot": 0.15,
+    "velocity": 0.10
+  },
+  "thresholds": {
+    "joint": 0.15,
+    "key_body": 0.12,
+    "root_pos": 0.08,
+    "root_rot": 10.0,
+    "velocity": 0.25
+  },
+  "pass_criteria": {
+    "success_rate": 0.8,
+    "score_mean": 1.0
+  },
+  "leaderboard": {
+    "sort_by": "frame_score_mean",
+    "ascending": true
+  }
+}

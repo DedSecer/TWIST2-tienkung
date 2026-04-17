@@ -113,6 +113,175 @@ bash run_motion_server.sh tienkung /path/to/motion.pkl
 bash sim2sim_tienkung.sh
 ```
 
+### 3.6 离线评估仿真跟踪质量
+
+仓库现在提供了一个离线评估脚本，用于比较“仿真中机器人实际动作”和“参考动作”之间的差异。这个流程不侵入实时控制回路，适合做回放分析、指标对比和批量回归。
+
+评估入口：
+
+- `deploy_real/eval_sim_tracking.py`
+- 默认配置文件：`deploy_real/data_utils/eval_sim_tracking_config.json`
+
+#### 第一步：采集仿真轨迹
+
+评估脚本读取的是 `record_proprio` 生成的 pkl 记录文件。因此在采集评估数据前，需要先打开 `sim2sim.sh` 中的 `--record_proprio` 开关，重新跑一段仿真。
+
+典型流程：
+
+```bash
+bash run_motion_server.sh
+bash sim2sim.sh
+```
+
+采集完成后，`deploy_real/server_low_level_g1_sim.py` 会输出：
+
+- `twist2_proprio_recordings.pkl`
+
+该文件中会记录：
+
+- 时间戳
+- 关节位置 `dof_pos`
+- 关节速度 `dof_vel`
+- 根部位置 `root_pos`
+- 根部姿态四元数 `root_quat`
+- 根部线速度 `root_lin_vel`
+- 根部角速度 `root_ang_vel`
+
+这些字段足以支持关节误差、根部误差、速度误差和 key body 误差计算。
+
+#### 第二步：单文件评估
+
+```bash
+/home/vega/anaconda3/envs/twist2/bin/python deploy_real/eval_sim_tracking.py \
+  --sim_pkl deploy_real/twist2_proprio_recordings.pkl \
+  --motion_file assets/example_motions/0807_yanjie_walk_001.pkl \
+  --xml assets/g1/g1_sim2sim_29dof.xml \
+  --out_dir deploy_real/eval_outputs
+```
+
+常用参数说明：
+
+- `--sim_pkl`：待评估的仿真记录文件
+- `--motion_file`：参考动作文件，传给 `MotionLib`
+- `--xml`：用于 key body 正向运动学的 MuJoCo XML
+- `--out_dir`：评估结果输出目录
+- `--motion_id`：当 `motion_file` 是 yaml 或多 motion 集合时，指定使用哪个 motion
+- `--start_time`：从参考动作的哪个时间点开始对齐
+- `--max_duration`：限制评估时长，便于做短片段对比
+- `--disable_yaw_align`：关闭 yaw 对齐，适合排查全局朝向误差
+
+#### 第三步：批量评估与排行榜
+
+当你有多段 pkl 记录需要横向比较时，可以使用批量模式：
+
+```bash
+/home/vega/anaconda3/envs/twist2/bin/python deploy_real/eval_sim_tracking.py \
+  --batch_glob "deploy_real/records/*.pkl" \
+  --motion_file assets/example_motions/0807_yanjie_walk_001.pkl \
+  --xml assets/g1/g1_sim2sim_29dof.xml \
+  --out_dir deploy_real/eval_batch_outputs
+```
+
+批量模式会：
+
+- 对每个 pkl 单独生成一个结果子目录
+- 额外生成总排行榜文件
+- 按配置文件中的排序规则输出 leaderboard
+
+#### 默认配置文件
+
+评估默认阈值、权重和排行榜排序规则来自：
+
+- `deploy_real/data_utils/eval_sim_tracking_config.json`
+
+配置项包括：
+
+- `weights`：综合分数各指标权重
+- `thresholds`：每个指标的 success 阈值
+- `pass_criteria.success_rate`：最低成功率要求
+- `pass_criteria.score_mean`：平均综合分数上限
+- `leaderboard.sort_by`：排行榜排序字段
+- `leaderboard.ascending`：是否升序排序
+
+如果你只想临时覆盖配置，而不改 JSON 文件，可以在命令行中追加：
+
+```bash
+--weights joint=0.4,key_body=0.2,root_pos=0.15,root_rot=0.15,velocity=0.1
+--thresholds joint=0.12,key_body=0.1,root_pos=0.06,root_rot=8.0,velocity=0.2
+```
+
+#### 输出文件说明
+
+单文件评估默认生成：
+
+- `summary.json`
+- `frame_metrics.csv`
+- `metrics_plot.png`
+
+各文件含义如下：
+
+- `summary.json`
+  - 本次评估的总体摘要
+  - 包含 `success_rate`、`pass`、`frame_score` 统计、各项指标均值/P95/最大值
+  - 包含本次运行使用的 `weights`、`thresholds`、`motion_id`、`key_bodies_used`
+
+- `frame_metrics.csv`
+  - 逐帧误差明细
+  - 每一帧包含 joint/root/key body/velocity 误差、综合分数以及 success 标记
+  - 适合后续做 pandas 分析或导入表格软件查看
+
+- `metrics_plot.png`
+  - 误差随时间变化曲线图
+  - 便于快速定位哪一段动作开始偏离参考动作
+
+批量评估会在总输出目录额外生成：
+
+- `leaderboard.json`
+- `leaderboard.csv`
+
+其中：
+
+- `leaderboard.json` 适合程序读取
+- `leaderboard.csv` 适合人工浏览、排序和做实验记录
+
+排行榜默认包含：
+
+- `run_name`
+- `success_rate`
+- `frame_score_mean`
+- `frame_score_p95`
+- `joint_mean`
+- `root_pos_mean`
+- `root_rot_mean`
+- `key_body_mean`
+- `velocity_mean`
+- `pass`
+
+#### 指标解释
+
+当前离线评估脚本默认统计以下误差项：
+
+- `joint`：关节位置平均绝对误差
+- `root_pos`：根部位置平均绝对误差
+- `root_rot`：根部姿态角度误差，单位为度
+- `key_body`：关键 body 相对根部位置误差
+- `velocity`：关节速度与根部速度的综合误差
+
+综合分数 `frame_score` 是按配置文件中的 `weights` 对归一化误差加权得到。数值越小，代表跟踪效果越好。
+
+#### 结果解读建议
+
+- `success_rate` 高、`frame_score_mean` 低：通常表示整体跟踪稳定
+- `joint` 误差低但 `root_pos` 或 `root_rot` 误差高：通常说明局部姿态接近，但全局位姿漂移明显
+- `key_body` 误差偏高：通常说明末端或上肢动作没有很好跟上参考动作
+- `velocity` 误差偏高：通常说明动作节奏、加减速或切换阶段没有对齐
+
+如果你只看一个指标，容易误判。更稳妥的做法是同时看：
+
+- `summary.json` 的总体统计
+- `metrics_plot.png` 的时间曲线
+- `leaderboard.csv` 的横向排名
+
 ---
 
 ## 4. 改造后训练架构

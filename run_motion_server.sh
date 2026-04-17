@@ -26,6 +26,11 @@ redis_ip="localhost"
 # this is my unitree g1's ip in wifi
 # redis_ip="192.168.110.24"
 
+# Ensure dynamic linker can find libpython from the active conda env.
+if [[ -n "${CONDA_PREFIX}" && -d "${CONDA_PREFIX}/lib" ]]; then
+    export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
+fi
+
 
 # Run the motion server
 python server_motion_lib.py \

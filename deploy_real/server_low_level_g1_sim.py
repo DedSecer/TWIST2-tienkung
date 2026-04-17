@@ -177,6 +177,39 @@ class RealTimePolicyController:
         self.record_video = record_video
         self.record_proprio = record_proprio
         self.proprio_recordings = [] if record_proprio else None
+        self.last_mimic_obs = np.zeros(self.n_mimic_obs, dtype=np.float32)
+        self.last_left_hand_action = np.zeros(7, dtype=np.float32)
+        self.last_right_hand_action = np.zeros(7, dtype=np.float32)
+        self.last_neck_action = np.zeros(2, dtype=np.float32)
+        self._last_redis_warn_time = 0.0
+
+    def _decode_redis_json(self, redis_value, fallback_value, key_name):
+        if redis_value is None:
+            now = time.time()
+            if now - self._last_redis_warn_time > 1.0:
+                print(f"Redis key {key_name} is missing; reusing previous value.")
+                self._last_redis_warn_time = now
+            return fallback_value.copy()
+        try:
+            decoded = np.asarray(json.loads(redis_value), dtype=np.float32)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            now = time.time()
+            if now - self._last_redis_warn_time > 1.0:
+                print(f"Redis key {key_name} has invalid JSON; reusing previous value.")
+                self._last_redis_warn_time = now
+            return fallback_value.copy()
+
+        if decoded.shape != fallback_value.shape:
+            now = time.time()
+            if now - self._last_redis_warn_time > 1.0:
+                print(
+                    f"Redis key {key_name} shape mismatch: got {decoded.shape}, "
+                    f"expected {fallback_value.shape}; reusing previous value."
+                )
+                self._last_redis_warn_time = now
+            return fallback_value.copy()
+
+        return decoded
         
 
     def reset_sim(self):
@@ -272,10 +305,14 @@ class RealTimePolicyController:
                     for key in keys:
                         self.redis_pipeline.get(key)
                     redis_results = self.redis_pipeline.execute()
-                    action_mimic = json.loads(redis_results[0])
-                    action_left_hand = json.loads(redis_results[1])
-                    action_right_hand = json.loads(redis_results[2])
-                    action_neck = json.loads(redis_results[3])
+                    action_mimic = self._decode_redis_json(redis_results[0], self.last_mimic_obs, keys[0])
+                    action_left_hand = self._decode_redis_json(redis_results[1], self.last_left_hand_action, keys[1])
+                    action_right_hand = self._decode_redis_json(redis_results[2], self.last_right_hand_action, keys[2])
+                    action_neck = self._decode_redis_json(redis_results[3], self.last_neck_action, keys[3])
+                    self.last_mimic_obs = action_mimic
+                    self.last_left_hand_action = action_left_hand
+                    self.last_right_hand_action = action_right_hand
+                    self.last_neck_action = action_neck
 
                     # Construct observation for TWIST2 controller
                     obs_full = np.concatenate([action_mimic, obs_proprio])
@@ -358,6 +395,10 @@ class RealTimePolicyController:
                             'dof_vel': dof_vel.tolist(),
                             'rpy': rpy.tolist(),
                             'ang_vel': ang_vel.tolist(),
+                            'root_pos': self.data.qpos[:3].tolist(),
+                            'root_quat': self.data.qpos[3:7].tolist(),
+                            'root_lin_vel': self.data.qvel[:3].tolist(),
+                            'root_ang_vel': self.data.qvel[3:6].tolist(),
                             'target_dof_pos': action_mimic.tolist()[-29:],
                         }
                         self.proprio_recordings.append(proprio_data)
