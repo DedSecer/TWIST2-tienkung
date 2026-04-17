@@ -177,7 +177,7 @@ class G1MimicStuFutureCfgDAgger(G1MimicStuFutureCfg):
         resume_path = None
         
         teacher_experiment_name = 'test'
-        teacher_proj_name = 'g1_priv_mimic'
+        teacher_proj_name = 'g1_priv_mimic_amp'
         teacher_checkpoint = -1
         eval_student = False
         
