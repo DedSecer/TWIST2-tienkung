@@ -697,7 +697,6 @@ class HumanoidMimic(HumanoidChar):
             self.reindex(self.dof_pos),
             self.reindex(self.dof_vel),
             key_body_pos,
-            self.reindex(self.action_history_buf[:, -1]),
         ), dim=-1)
         return amp_obs
 
@@ -717,7 +716,6 @@ class HumanoidMimic(HumanoidChar):
             self.reindex(self._ref_dof_pos),
             self.reindex(self._ref_dof_vel),
             key_body_pos,
-            self.reindex(self._ref_dof_vel),
         ), dim=-1)
         return amp_demo_obs
 

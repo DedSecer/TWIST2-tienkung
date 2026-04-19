@@ -416,7 +416,7 @@ class G1MimicPrivAmpCfgPPO(G1MimicPrivCfgPPO):
         amp_reward_scale = 0.1
         amp_reward_clip_min = -2.0
         amp_reward_clip_max = 2.0
-        amp_obs_dim = 130
+        amp_obs_dim = 101
         amp_disc_hidden_dims = [512, 256]
         amp_disc_learning_rate = 1e-4
         amp_disc_loss_coef = 1.0
